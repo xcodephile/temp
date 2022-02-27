@@ -117,19 +117,19 @@ deploy() {
 }
 
 main() {
-  init
-  build
-  test
-  resume_site_dir
+  echo ">>> step: init"; init
+  echo ">>> step: build"; build
+  echo ">>> step: test"; test
+  echo ">>> step: resume_site_dir"; resume_site_dir
 
   if $_opt_dry_run; then
     exit 0
   fi
 
-  setup_gh
-  backup
-  flush
-  deploy
+  echo ">>> step: setup_gh"; setup_gh
+  echo ">>> step: backup"; backup
+  echo ">>> step: flush"; flush
+  echo ">>> step: deploy"; deploy
 }
 
 while (($#)); do

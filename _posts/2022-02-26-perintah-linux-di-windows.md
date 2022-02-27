@@ -35,21 +35,20 @@ WSL bisa jadi pengantar ideal bagi mereka yang masih asing dengan Linux tanpa ha
 * Windows 11, atau
 * Windows 10 versi 2004+ (Build 19041+)
 
-
 > Untuk mengetahui build number, tekan tombol <kbd>Windows</kbd> dan <kbd>R</kbd> bersamaan, ketik `winver`, lalu klik <kbd>OK</kbd>.
-{: .prompt-note }
+{: .prompt-tip }
 
 ## Instalasi
 
 Hanya diperlukan beberapa klik dan ketik saja untuk memperoleh fitur ini.
 
-\1. Aktifkan fitur WSL
+### 1. Aktifkan fitur WSL
 
 ![Instal WSL](https://raw.githubusercontent.com/xcodephile/xcodephile.github.io/main/assets/img/posts/wsl-1.png)
 
 Buka Pengaturan > Aplikasi > Fitur Opsional > Fitur Windows Lainnya > Windows Features. Centang Windows Subsystem for Linux lalu klik OK. Windows akan mengunduh beberapa file yang diperlukan secara otomatis. Jika sudah selesai, nyalakan ulang komputer agar WSL bisa diaktifkan.
 
-\2. Unduh Linux
+### 2. Unduh Linux
 
 ![Unduh Linux](https://raw.githubusercontent.com/xcodephile/xcodephile.github.io/main/assets/img/posts/wsl-2.png)
 
@@ -57,7 +56,7 @@ Buka aplikasi Windows Store lalu instal distro Linux yang kamu inginkan, misalny
 
 Setelah selesai mengunduh, Klik Launch untuk memulai proses instalasi Ubuntu. Ini akan membuka jendela command line interface. Di awal instalasi, sistem akan meminta nama pengguna dan sandi yang nantnya digunakan di Ubuntu. Samakan saja dengan Windows punyamu agar tidak lupa.
 
-\3. Selesai
+### 3. Selesai
 
 Yup, selesai. Silahkan buka aplikasi terminal favoritmu. Di sini saya menggunakan Windows Terminal.
 
