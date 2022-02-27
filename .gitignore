@@ -1,5 +1,6 @@
 # hidden files
 .*
+!_posts/**
 !.git*
 !.editorconfig
 !.nojekyll
