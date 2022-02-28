@@ -5,9 +5,6 @@ categories: []    # max 2 elements
 tags: [linux, windows, wsl, shell]     # should always be lowercase. min = 0, max = infinity
 ---
 
-> Posting ini masih ditandai sebagai WIP (Work in Progress), yang berarti ada bagian yang belum lengkap atau bahkan tidak akurat. 
-{: .prompt-danger }
-
 Apakah kamu seorang programmer, content creator, dan gamer sekaligus, yang dituntut untuk punya sistem operasi yang mendukung pengembangan perangkat lunak dan juga menawarkan banyak aplikasi dan game? Atau setidaknya, apakah kamu tertarik akan keseksian command Linux namun tidak bisa lepas dari kepraktisan Windows?
 
 Jika iya, kamu berada di tempat yang benar. Lanjut scroll ke bawah.
