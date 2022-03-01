@@ -1,8 +1,8 @@
 ---
-title: 'WSL, Solusi Menjalankan Perintah Linux di Windows [WIP]'
+title: 'WSL, Solusi Menjalankan Perintah Linux di Windows'
 date: 2022-02-26 17:12:00 +0700
 categories: []    # max 2 elements
-tags: [linux, windows, wsl, shell]     # should always be lowercase. min = 0, max = infinity
+tags: [linux, windows, wsl, shell, terminal]     # should always be lowercase. min = 0, max = infinity
 ---
 
 Apakah kamu seorang programmer, content creator, dan gamer sekaligus, yang dituntut untuk punya sistem operasi yang mendukung pengembangan perangkat lunak dan juga menawarkan banyak aplikasi dan game? Atau setidaknya, apakah kamu tertarik akan keseksian command Linux namun tidak bisa lepas dari kepraktisan Windows?
@@ -67,7 +67,7 @@ Saya merekomendasikan Windows Terminal karena punya banyak fitur dan tampilannya
 
 1. Agar juga bisa menginstal Docker (butuh upgrade ke versi WSL 2).
 2. Lanjutan dari poin 1, dapat mengembangkan perangkat lunak beserta ekosistemnya dengan lebih leluasa, misalnya menggunakan Kubernetes.
-3. Posting ini adalah pendahuluan untuk posting selanjutnya mengenai [Percantik Tampilan Windows Terminal Menggunakan Zsh (Z Shell)](/). WSL sudah terkonfigurasi otomatis sehingga langsung dapat digunakan di Windows Terminal.
+3. Posting ini adalah pendahuluan untuk posting selanjutnya mengenai [Percantik Tampilan Windows Terminal WSL Menggunakan Zsh (Z Shell)](/). WSL sudah terkonfigurasi otomatis sehingga langsung dapat digunakan di Windows Terminal.
 
 ## Windows Subsystem for Linux version 2 (WSL 2)
 
