@@ -1,12 +1,9 @@
 ---
-title: 'Percantik Tampilan Windows Terminal WSL Ubuntu Menggunakan Zsh (Z shell) [WIP]'
+title: 'Percantik Tampilan Windows Terminal WSL Ubuntu Menggunakan Zsh (Z shell)'
 date: 2022-02-28 13:19:00 +0700
 categories: []    # max 2 elements
 tags: [linux, windows, wsl, shell, terminal, zsh]     # should always be lowercase. min = 0, max = infinity
 ---
-
-> Posting ini masih ditandai sebagai WIP (work in progress) yang kelengkapan dan akurasinya masih rendah.
-{: .prompt-danger }
 
 Ingin rupa Windows Terminal kamu berubah dari yang super monoton old school menjadi lebih fresh seperti ini?
 
