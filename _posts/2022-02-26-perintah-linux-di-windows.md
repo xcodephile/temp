@@ -65,7 +65,7 @@ Saya merekomendasikan Windows Terminal karena punya banyak fitur dan tampilannya
 
 ## Kenapa Harus WSL?
 
-1. Agar juga bisa menginstal Docker (butuh upgrade ke versi WSL 2).
+1. Agar bisa menjalankan Docker dan aplikasi GUI Ubuntu (butuh upgrade ke versi WSL 2).
 2. Lanjutan dari poin 1, dapat mengembangkan perangkat lunak beserta ekosistemnya dengan lebih leluasa, misalnya menggunakan Kubernetes.
 3. Posting ini adalah pendahuluan untuk posting selanjutnya mengenai [Percantik Tampilan Windows Terminal WSL Menggunakan Zsh (Z Shell)](/). WSL sudah terkonfigurasi otomatis sehingga langsung dapat digunakan di Windows Terminal.
 
