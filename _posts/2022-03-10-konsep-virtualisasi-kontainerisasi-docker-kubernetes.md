@@ -1,5 +1,5 @@
 ---
-title: 'Virtualisasi vs Kontainerisasi; Docker dan Kubernetes'
+title: 'Virtualisasi vs Kontainerisasi, Docker dan Kubernetes'
 date: 2022-03-10 22:30:00 +0700
 categories: []    # max 2 elements
 tags: [virtualization, containerization, cloud, docker, kubernetes]     # should always be lowercase. min = 0, max = infinity
