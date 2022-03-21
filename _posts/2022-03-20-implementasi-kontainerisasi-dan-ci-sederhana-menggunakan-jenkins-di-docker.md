@@ -24,6 +24,8 @@ Topik yang akan dibahas meliputi:
 
 # Overview
 
+![Animasi demo singkat](../../assets/img/posts/jenkins-demo-dsl.gif)
+
 Di posting kali ini kita akan men-setup Jenkins dan Redis di dua kontainer terpisah menggunakan [Docker](https://docs.docker.com/get-started/overview/), membuat Job Jenkins dengan jenis Freestyle Project yang berisi task sederhana untuk get dan set key Redis, memginstal plugin DSL dan membuat Seed Job sehingga semua Job lainnya dapat dibuat otomatis dengan hanya satu aksi tanpa harus klik sana klik sini (alias [configuration as code](https://www.cloudbees.com/blog/configuration-as-code-everything-need-know)), serta mengunggah script DSL ke GitHub yang nantinya dihubungkan melalui webhook Smee agar dengan hanya mem-push ke GitHub, semua perubahan secara otomatis ter-apply ke Jenkins (alias [continuous integration](https://www.infoworld.com/article/3271126/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html)).
 
 # FAQ
