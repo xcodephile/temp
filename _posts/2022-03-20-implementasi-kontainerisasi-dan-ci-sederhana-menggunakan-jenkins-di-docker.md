@@ -24,21 +24,17 @@ Topik yang akan dibahas meliputi:
 
 # Overview
 
-Di posting kali ini kita akan men-setup Jenkins dan Redis di dua kontainer terpisah menggunakan [Docker](https://docs.docker.com/get-started/overview/), membuat Job Jenkins dengan jenis Freestyle Project yang berisi task sederhana untuk get dan set key Redis, memginstal plugin DSL sehingga semua Job dapat dibuat otomatis dengan hanya satu aksi tanpa harus klik sana klik sini (alias [configuration as code](https://www.cloudbees.com/blog/configuration-as-code-everything-need-know)), dan mengunggah script DSL ke GitHub dan memasang webhook melalui Smee agar dengan hanya mem-push ke GitHub, semua perubahan secara otomatis ter-apply ke Jenkins (alias [continuous integration](https://www.infoworld.com/article/3271126/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html)).
+Di posting kali ini kita akan men-setup Jenkins dan Redis di dua kontainer terpisah menggunakan [Docker](https://docs.docker.com/get-started/overview/), membuat Job Jenkins dengan jenis Freestyle Project yang berisi task sederhana untuk get dan set key Redis, memginstal plugin DSL dan membuat Seed Job sehingga semua Job lainnya dapat dibuat otomatis dengan hanya satu aksi tanpa harus klik sana klik sini (alias [configuration as code](https://www.cloudbees.com/blog/configuration-as-code-everything-need-know)), serta mengunggah script DSL ke GitHub yang nantinya dihubungkan melalui webhook Smee agar dengan hanya mem-push ke GitHub, semua perubahan secara otomatis ter-apply ke Jenkins (alias [continuous integration](https://www.infoworld.com/article/3271126/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html)).
 
 # FAQ
 
 ## Kenapa Kontainer?
 
-Jenkins dan Redis diinstal dikontainer agar tidak bergantung pada komputer host (laptop kamu). Apapun yang terjadi pada komputer host dan kontainer, akan mudah di-restore. Jika di kemudian hari Jenkins dan Redis tidak dibutuhkan lagi, cukup hapus kontainer dan image-nya saja dan tidak bakal ada file sampah tersisa di komputer host.
+Jenkins dan Redis diinstal di kontainer agar tidak bergantung pada komputer host (laptop kamu). Apapun yang terjadi pada komputer host dan kontainer, akan mudah di-restore. Jika di kemudian hari Jenkins dan Redis tidak dibutuhkan lagi, cukup hapus kontainer dan image-nya saja (serta volume). Tidak bakal ada file sampah tersisa di komputer host.
 
 ## Apa itu DSL?
 
 [DSL](https://plugins.jenkins.io/job-dsl/) adalah plugin Jenkins yang memungkinkan kita menerapkan praktik [configuration as code](https://www.cloudbees.com/blog/configuration-as-code-everything-need-know). Ini adalah solusi bagus karena semua Job akan tersimpan dengan baik di repositori (misalnya di GitHub) karena tidak perlu lagi mengklik ini itu di dashboard Jenkins untuk membuat Job dan semua perubahan konfigurasi akan tercatat di GitHub. Konfigurasi tersimpan di hanya satu tempat. [Single source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth). Selain itu, jika nantinya ada masalah pada Jenkins, semua konfigurasi dapat di-restore dengan cepat.
-
-# Repositori
-- DSL: [github.com/xcodephile/xcodephile-jenkins](https://github.com/xcodephile/xcodephile-jenkins)
-- Docker Compose dan Dockerfile: [github.com/xcodephile/xcodephile-docker](https://github.com/xcodephile/xcodephile-docker)
 
 # Prasyarat
 - Docker sudah diinstal
@@ -135,7 +131,7 @@ Please use the following password to proceed to installation:
 1906342b77f244c79ea6a24f28959b8e
 ```
 
-Di halaman Customize Jenkins, pilih Install Suggested Plugins. Tunggu hingga semua plugin terinstal. Perhatikan bahwa menu Select Plugin to Install tidak akan menampilkan semua plugin yang tersedia di internet, termasuk DSL.
+Di halaman Customize Jenkins, pilih Install Suggested Plugins. Tunggu hingga semua plugin terinstal. Perhatikan bahwa menu Select Plugin to Install tidak akan menampilkan semua plugin yang tersedia di internet, termasuk DSL. Plugin DSL hanya bisa dperoleh di menu Plugin Manager ketika Jenkins telah selesai diinstal.
 
 ![Dashboard Jenkins](../../assets/img/posts/jenkins-dashboard.png)_Dashboard Jenkins_
 
@@ -167,7 +163,7 @@ Selesai. Jangan lupa klik Save.
 
 ### Tambah Credential
 
-Langkah ini diperlukan untuk me-masking password Redis yang telah kita definisikan di file `docker-compose.yml` pada baris ke 26. Password ini digunakan oleh Jenkins tiap kali mengakses Redis, baik itu untuk memperoleh atau mengeset suatu key. Alih-alih meng-hardcode password yang tentunya tidak aman, tambahkan password ini ke fitur Credentials Jenkins.
+Langkah ini diperlukan untuk me-masking password Redis yang telah kita definisikan di file `docker-compose.yml` pada baris ke 26. Password ini digunakan oleh Jenkins tiap kali mengakses Redis, baik untuk memperoleh atau mengeset suatu key. Alih-alih meng-hardcode password yang tentunya tidak aman, tambahkan password ini ke fitur Credentials Jenkins.
 
 Caranya, klik username admin yang ada di header kanan atas (sebelah kiri tombol logout), lalu klik Credentials, klik Jenkins yang ada di bagian Stores from Parent, klik Global Credentials, lalu klik Add Credentials. Pada menu dropdown Kind, pilih Secret Text, lalu isi kolom isian Secret dengan password Redis, dalam hal ini `12345678`. Isi juga ID dengan nama kredensialnya, yaitu `REDIS_PASSWORD`. Klik OK.
 
@@ -223,7 +219,7 @@ $ git push origin main
 
 Kunjungi [smee.io](https://smee.io/) di browser. Klik Start a New Channel. Simpan baik-baik URL-nya. Kalau perlu di-bookmark.
 
-### Jalankan Smee cLient
+### Jalankan Smee Client
 
 Beralih ke kontainer Jenkins. Masuk ke kontainer dengan cara:
 
@@ -257,5 +253,5 @@ Isi Payload URL dengan URL Smee. Lalu pilih `application/json` di menu dropdown 
 
 Yup, selesai.
 
-Tiap kali kamu melakukan perubahan di repositori melalui perintah `git push` di komputermu, Jenkins akan secara otomatis menjalankan DSL script dan meng-apply perubahan tersebut. Katakanlah kamu membuat Job baru yang berisi task untuk menambah data baru ke database MySQL. Dengan hanya `git push`, Job tersebut langsung muncul di Jenkins dan siap pakai.
+Tiap kali kamu melakukan perubahan di repositori melalui perintah `git push` di komputermu, Jenkins akan secara otomatis menjalankan DSL script dan meng-apply perubahan tersebut. Katakanlah kamu membuat Job baru yang berisi task untuk menambah data ke database MySQL. Dengan hanya `git push`, Job tersebut langsung muncul di Jenkins dan siap pakai.
 
