@@ -1,0 +1,31 @@
+I"�	<blockquote class="prompt-danger">
+  <p>“Posting ini masih ditandai sebagai WIP (work in progress).”</p>
+</blockquote>
+
+<p>Mirip seperti posting sebelumnya yang berjudul <a href="https://xcodephile.github.io/posts/percantik-windows-terminal-menggunakan-zsh">Percantik Tampilan Windows Terminal WSL Ubuntu Menggunakan Zsh</a>, kali ini yang menjadi kelinci percobaan beralih dari Windows Terminal ke VS Code alias Visual Studio Code.</p>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/xcodephile.github.io/main/assets/img/posts/vscode-0.jpg" alt="Sebelum" width="607" height="341" /><em>Sebelum</em></p>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/xcodephile.github.io/main/assets/img/posts/vscode-1.png" alt="Sesudah" width="607" height="341" /><em>Sesudah</em></p>
+
+<p>Siapa yang tidak mengenal VS Code? Salah satu <a href="https://en.wikipedia.org/wiki/Integrated_development_environment">IDE</a> terbaik besutan Microsoft ini dibekali dengan sejuta fitur dan plugin yang membuat kita betah untuk menggunakannya. IDE ini bisa digunakan untuk banyak tujuan seperti membuat website, web apps, web services, mobile apps, hingga desktop apps. Tidak heran ia dapat mendukung banyak bahasa seperti C++, Java, Swift, Visual Basic, Python, Go, JavaScript, PHP, CSS, SQL, PowerShell, BASH, dan lainnya.</p>
+
+<p>Di posting kali ini, saya akan menjabarkan bagaimana merombak VS Code menjadi IDE yang minimalis dan juga canggih.</p>
+
+<h2 id="yang-kamu-butuhkan">Yang Kamu Butuhkan</h2>
+
+<ul>
+  <li><a href="https://git-scm.com/download/win">Git bash</a></li>
+  <li>Shell: <a href="https://github.com/zsh-users/zsh">Zsh</a>
+    <ul>
+      <li>Framework: <a href="https://github.com/ohmyzsh/ohmyzsh">Oh My Zsh</a></li>
+      <li>Theme: <a href="https://github.com/romkatv/powerlevel10k">Powerlevel10k</a></li>
+    </ul>
+  </li>
+  <li>Theme: <a href="https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme">GitHub Theme</a></li>
+  <li>Icon packs: <a href="https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme">Material Icon Theme</a></li>
+  <li><a href="https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens">GitLens</a></li>
+  <li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack">Remote Development</a></li>
+  <li><a href="https://marketplace.visualstudio.com/items?itemName=iocave.customize-ui">Customize UI</a></li>
+</ul>
+:ET

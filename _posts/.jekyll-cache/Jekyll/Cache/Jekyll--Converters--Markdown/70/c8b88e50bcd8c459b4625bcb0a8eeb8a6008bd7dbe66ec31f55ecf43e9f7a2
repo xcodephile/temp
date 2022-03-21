@@ -1,0 +1,219 @@
+I"�:<h1 id="tech-stack">Tech Stack</h1>
+
+<p>Topik yang akan dibahas meliputi:</p>
+
+<ul>
+  <li>Kontainer:
+    <ul>
+      <li><a href="https://www.jenkins.io/doc/">Jenkins</a></li>
+      <li><a href="https://redis.io/">Redis</a></li>
+    </ul>
+  </li>
+  <li><a href="https://docs.docker.com/get-started/overview/">Docker</a>
+    <ul>
+      <li><a href="https://docs.docker.com/compose/">Docker Compose</a></li>
+      <li><a href="https://docs.docker.com/engine/reference/builder/">Dockerfile</a></li>
+    </ul>
+  </li>
+  <li><a href="https://www.jenkins.io/doc/">Jenkins</a>:
+    <ul>
+      <li><a href="https://plugins.jenkins.io/job-dsl/">DSL</a></li>
+      <li><a href="https://www.jenkins.io/doc/">Job</a></li>
+    </ul>
+  </li>
+  <li><a href="https://smee.io/">Webhook</a></li>
+</ul>
+
+<h1 id="overview">Overview</h1>
+
+<p>Di posting kali ini kita akan men-setup Jenkins dan Redis di dua kontainer terpisah menggunakan <a href="https://docs.docker.com/get-started/overview/">Docker</a>, membuat Job Jenkins dengan jenis Freestyle Project yang berisi task sederhana untuk get dan set key Redis, memginstal plugin DSL sehingga semua Job dapat dibuat otomatis dengan hanya satu aksi tanpa harus klik sana klik sini (alias <a href="https://www.cloudbees.com/blog/configuration-as-code-everything-need-know">configuration as code</a>), dan mengunggah script DSL ke GitHub dan memasang webhook melalui Smee agar dengan hanya mem-push ke GitHub, semua perubahan secara otomatis ter-apply ke Jenkins (alias <a href="https://www.infoworld.com/article/3271126/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html">continuous integration</a>).</p>
+
+<h1 id="faq">FAQ</h1>
+
+<h2 id="kenapa-kontainer">Kenapa Kontainer?</h2>
+
+<p>Jenkins dan Redis diinstal dikontainer agar tidak bergantung pada komputer host (laptop kamu). Apapun yang terjadi pada komputer host dan kontainer, akan mudah di-restore. Jika di kemudian hari Jenkins dan Redis tidak dibutuhkan lagi, cukup hapus kontainer dan image-nya saja dan tidak bakal ada file sampah tersisa di komputer host.</p>
+
+<h2 id="apa-itu-dsl">Apa itu DSL?</h2>
+
+<p><a href="https://plugins.jenkins.io/job-dsl/">DSL</a> adalah plugin Jenkins yang memungkinkan kita menerapkan praktik <a href="https://www.cloudbees.com/blog/configuration-as-code-everything-need-know">configuration as code</a>. Ini adalah solusi bagus karena semua Job akan tersimpan dengan baik di repositori (misalnya di GitHub) karena tidak perlu lagi mengklik ini itu di dashboard Jenkins untuk membuat Job dan semua perubahan konfigurasi akan tercatat di GitHub. Konfigurasi tersimpan di hanya satu tempat. <a href="https://en.wikipedia.org/wiki/Single_source_of_truth">Single source of truth</a>. Selain itu, jika nantinya ada masalah pada Jenkins, semua konfigurasi dapat di-restore dengan cepat.</p>
+
+<h1 id="repositori">Repositori</h1>
+<ul>
+  <li>DSL: <a href="https://github.com/xcodephile/xcodephile-jenkins">github.com/xcodephile/xcodephile-jenkins</a></li>
+  <li>Docker Compose dan Dockerfile: <a href="https://github.com/xcodephile/xcodephile-docker">github.com/xcodephile/xcodephile-docker</a></li>
+</ul>
+
+<h1 id="prasyarat">Prasyarat</h1>
+<ul>
+  <li>Docker sudah diinstal</li>
+  <li>Repositori GitHub sudah disiapkan</li>
+</ul>
+
+<h1 id="instalasi-dan-konfigurasi">Instalasi dan Konfigurasi</h1>
+
+<h2 id="setup-kontainer">Setup Kontainer</h2>
+
+<p>Simpan file <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> dan <code class="language-plaintext highlighter-rouge">Dockerfile</code> berikut ini di dalam satu direktori yang sama.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># docker-compose.yml</span>
+<span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3.8'</span>
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">jenkins</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> 
+      <span class="na">context</span><span class="pi">:</span> <span class="s">.</span>
+      <span class="na">dockerfile</span><span class="pi">:</span> <span class="s">Dockerfile</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">jenkins</span>
+    <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">user</span><span class="pi">:</span> <span class="s">root</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">8081:8080</span>
+    <span class="pi">-</span> <span class="s">50001:50000</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">~/docker-volume/jenkins:/var/jenkins_home</span>
+    <span class="pi">-</span> <span class="s">/var/run/docker.sock:/var/run/docker.sock</span>
+    <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">network</span>
+  <span class="na">redis</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">redis</span>
+    <span class="na">container_name</span><span class="pi">:</span> <span class="s">redis</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">6379:6379</span>
+    <span class="na">networks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">network</span>
+    <span class="na">command</span><span class="pi">:</span> <span class="s">redis-server --save 20 1 --requirepass 12345678 --loglevel warning</span>
+<span class="na">networks</span><span class="pi">:</span>
+  <span class="na">network</span><span class="pi">:</span>
+    <span class="na">driver</span><span class="pi">:</span> <span class="s">bridge</span>
+</code></pre></div></div>
+
+<div class="language-Dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Dockerfile</span>
+<span class="k">FROM</span><span class="s"> jenkins/jenkins:lts</span>
+
+<span class="k">USER</span><span class="s"> root</span>
+
+<span class="c"># install npm and Smee (webhook payload delivery service)</span>
+<span class="k">RUN </span>curl <span class="nt">-fsSL</span> https://deb.nodesource.com/setup_17.x | bash -
+<span class="k">RUN </span>apt update
+<span class="k">RUN </span>apt <span class="nb">install</span> <span class="nt">-y</span> nodejs
+<span class="k">RUN </span>npm <span class="nb">install</span> <span class="nt">--global</span> smee-client
+
+<span class="c"># install screen to enable Smee run in background</span>
+<span class="k">RUN </span>apt <span class="nb">install</span> <span class="nt">-y</span> screen
+
+<span class="c"># install redis-cli command</span>
+<span class="k">RUN </span>apt <span class="nb">install</span> <span class="nt">-y</span> redis-tools
+</code></pre></div></div>
+
+<p>Jalankan perintah berikut di dalam direktori di mana kedua file tersebut berada:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose up <span class="nt">-d</span>
+</code></pre></div></div>
+
+<p>Validasi bahwa container telah berjalan dengan benar:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker ps
+
+<span class="c"># output:</span>
+
+CONTAINER ID   IMAGE             COMMAND                  CREATED        STATUS          PORTS                                              NAMES
+b4bc27a05497   jenkins_jenkins   <span class="s2">"/sbin/tini -- /usr/…"</span>   11 hours ago   Up 45 minutes   0.0.0.0:8081-&gt;8080/tcp, 0.0.0.0:50001-&gt;50000/tcp   jenkins
+6dc414e4d7aa   redis             <span class="s2">"docker-entrypoint.s…"</span>   11 hours ago   Up 45 minutes   0.0.0.0:6379-&gt;6379/tcp                             redis
+</code></pre></div></div>
+
+<h2 id="setup-jenkins">Setup Jenkins</h2>
+
+<h3 id="install-jenkins">Install Jenkins</h3>
+
+<p>Akses <a href="localhost:8081">localhost:8081</a> di browser. Halaman instalasi Jenkins akan muncul dan akan meminta temporary admin password. Jalankan perintah berikut untuk mengetahuinya:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker logs <span class="nt">-f</span> jenkins
+
+<span class="c"># output</span>
+Jenkins initial setup is required. An admin user has been created and a password generated.
+Please use the following password to proceed to installation:
+
+1906342b77f244c79ea6a24f28959b8e
+</code></pre></div></div>
+
+<p>Di halaman Customize Jenkins, pilih Install Suggested Plugins. Tunggu hingga semua plugin terinstal. Perhatikan bahwa menu Select Plugin to Install tidak akan menampilkan semua plugin yang tersedia di internet, termasuk DSL.</p>
+
+<p><img src="../assets/img/posts/jenkins-dashboard.png" alt="Dashboard Jenkins" /><em>Dashboard Jenkins</em></p>
+
+<h3 id="install-plugin-dsl">Install Plugin DSL</h3>
+
+<p>Jika proses instalasi Jenkins telah selesai, pada menu sidebar di halaman awal dashboard (gambar di atas), klik Manage Jenkins &gt; Manage Plugins &gt; Available &gt; cari <code class="language-plaintext highlighter-rouge">job dsl</code>. Centang dan klik Install Without Restart.</p>
+
+<p><img src="../assets/img/posts/jenkins-plugin-job-dsl.png" alt="Install plugin DSL" /></p>
+
+<p>Terakhir, klik menu Manage Jenkins yang ada pada sidebar di halaman awal dashboard. Klik Configure Global Security, uncheck Enable script security for Job DSL scripts. Klik Save. Langkah ini diperlukan agar fitur keamanan Jenkins membolehkan Jenkins untuk mengeksekusi file DSL script (lihat langkah selanjutnya).</p>
+
+<h3 id="buat-seed-job">Buat Seed Job</h3>
+
+<p>Seed Job adalah istilah yang mengacu pada Job khusus DSL yang fungsinya sebagai generator Job lain. Seed Job ini berjalan berdasarkan file DSL script yang nantinya kita sediakan.</p>
+
+<p>Di sidebar halaman awal dashboard, klik New Item, ketik nama Seed Job, misalnya <code class="language-plaintext highlighter-rouge">Seed-Job-DSL</code>. Pilih Freestyle Project lalu klik OK. Tunggu hingga Seed Job selesai dibuat dan Jenkins akan mengarahkan kita ke halaman Configure.</p>
+
+<p>Di bagian Build, klik menu dropdown Add Build Step lalu pilih Process Job DSLs. Masih di bagian Build, pilih Look on Filesystem dan ketik <code class="language-plaintext highlighter-rouge">job.groovy</code> di kolom isian DSL Script.</p>
+
+<p><img src="../assets/img/posts/jenkins-seedjob-configure-build.png" alt="" /><em>Build Section</em></p>
+
+<p>Untuk integrasi ke repositori, masih di halaman Configure yang sama, centang GitHub hook trigger for GITScm polling di bagian Build Triggers. Kemudian, pilih Git di bagian Source Code Management. Di sini, cukup 2 kolom isian saja yang harus disesuaikan: Repository URL dan Branch Specifier. Repository URL diisi dengan nama repositori file <code class="language-plaintext highlighter-rouge">job.groovy</code> disimpan. Sedangkan Branch Specifier isi saja <code class="language-plaintext highlighter-rouge">main</code>.</p>
+
+<p><img src="../assets/img/posts/jenkins-seedjob-configure-buildtriggers.png" alt="" /><em>Build Triggers Section</em></p>
+
+<p><img src="../assets/img/posts/jenkins-seedjob-configure-scm.png" alt="" /><em>Source Code Management Section</em></p>
+
+<p>Selesai. Jangan lupa klik Save.</p>
+
+<h3 id="tambah-credential">Tambah Credential</h3>
+
+<p>Langkah ini diperlukan untuk me-masking password Redis yang telah kita definisikan di file <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> pada baris ke 26. Password ini digunakan oleh Jenkins tiap kali mengakses Redis, baik itu untuk memperoleh atau mengeset suatu key. Alih-alih meng-hardcode password yang tentunya tidak aman, tambahkan password ini ke fitur Credentials Jenkins.</p>
+
+<p>Caranya, klik username admin yang ada di header kanan atas (sebelah kiri tombol logout), lalu klik Credentials, klik Jenkins yang ada di bagian Stores from Parent, klik Global Credentials, lalu klik Add Credentials. Pada menu dropdown Kind, pilih Secret Text, lalu isi kolom isian Secret dengan password Redis, dalam hal ini <code class="language-plaintext highlighter-rouge">12345678</code>. Isi juga ID dengan nama kredensialnya, yaitu <code class="language-plaintext highlighter-rouge">REDIS_PASSWORD</code>. Klik OK.</p>
+
+<p><img src="../assets/img/posts/jenkins-cred.png" alt="" /></p>
+
+<h2 id="unggah-dsl-script-ke-repo">Unggah DSL Script ke Repo</h2>
+
+<p>Buat file baru dengan nama <code class="language-plaintext highlighter-rouge">job.groovy</code>.</p>
+
+<div class="language-groovy highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// job.groovy</span>
+<span class="n">job</span><span class="o">(</span><span class="s1">'JOB-02-FREESTYLE-PROJECT-02-REDIS'</span><span class="o">){</span>
+  <span class="n">description</span><span class="o">(</span><span class="s1">'Get or set Redis key.'</span><span class="o">)</span>
+
+  <span class="n">parameters</span><span class="o">{</span>
+    <span class="n">choiceParam</span><span class="o">(</span><span class="s1">'Action'</span><span class="o">,</span> <span class="o">[</span><span class="s1">'Getall'</span><span class="o">,</span> <span class="s1">'Get'</span><span class="o">,</span> <span class="s1">'Set'</span><span class="o">])</span>
+    <span class="n">stringParam</span><span class="o">(</span><span class="s1">'Key'</span><span class="o">)</span>
+    <span class="n">stringParam</span><span class="o">(</span><span class="s1">'Value'</span><span class="o">)</span>
+  <span class="o">}</span>
+
+  <span class="n">wrappers</span> <span class="o">{</span>
+    <span class="n">credentialsBinding</span> <span class="o">{</span>
+      <span class="n">string</span><span class="o">(</span><span class="s1">'REDIS_PASSWORD'</span><span class="o">,</span> <span class="s1">'REDIS_PASSWORD'</span><span class="o">)</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
+
+  <span class="n">steps</span> <span class="o">{</span>
+    <span class="n">shell</span><span class="o">(</span><span class="s1">'''#!/bin/bash
+
+if [[ "$Action" == "Getall" ]]; then
+  redis-cli -h redis -p 6379 -a $REDIS_PASSWORD keys '*'
+elif [[ "$Action" == "Get" ]]; then
+  redis-cli -h redis -p 6379 -a $REDIS_PASSWORD get $Key
+elif [[ "$Action" == "Set" ]]; then
+  redis-cli -h redis -p 6379 -a $REDIS_PASSWORD set $Key $Value
+fi
+    '''</span><span class="o">)</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Simpan file tersebut ke repositori.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git add job.groovy
+<span class="nv">$ </span>git commit <span class="nt">-m</span> <span class="s2">"create job.groovy"</span>
+<span class="nv">$ </span>git push origin main
+</code></pre></div></div>
+
+:ET

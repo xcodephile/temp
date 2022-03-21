@@ -1,0 +1,110 @@
+I"�$<h2 id="deskripsi">Deskripsi</h2>
+
+<p>Semakin tinggi lalu lintas yang hilir mudik melewati suatu jaringan, semakin tinggi pula kemungkinan terjadinya ancaman keamanan siber. Salah satu solusi untuk mencegahnya yaitu menggunakan perangkat lunak bernama Snort yang dapat mendeteksi aktivitas mencurigakan dengan cara memindai lalu lintas yang masuk dan keluar. Jika terbukti berbahaya, maka Snort akan melakukan pemblokiran akses berdasarkan alamat IP selama beberapa saat.</p>
+
+<p>Namun muncul satu masalah, Snort tidak dapat beradaptasi terhadap frekuensi dan jenis serangan. Ini berarti durasi waktu pemblokiran akan tetap statis dengan lama waktu yang telah ditentukan sebelumnya, meskipun host melakukan penyerangan dalam frekuensi tinggi dan severity tinggi.</p>
+
+<p>Logika Fuzzy diimplementasikan untuk mengatasi masalah tersebut sehingga tercipta IPS yang dapat beradaptasi terhadap frekuensi serangan dan jenis serangan.</p>
+
+<p><img src="https://images.unsplash.com/photo-1563920443079-783e5c786b83?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=2948&amp;q=80" alt="ilustrasi" /><em>Ilustrasi. Sumber: unsplash.com/speedoshots</em></p>
+
+<p><strong>Kode sumber</strong> dan semua file pendukung tersedia di repositori Github di <a href="https://github.com/xcodephile/university-final-project">xcodephile/university-final-project</a>. Untuk informasi mengenai tautan <strong>publikasi IEEE</strong> dan <strong>referensi</strong>, silahkan gulir ke bagian <a href="#tautan-eksternal">Tautan Eksternal</a> di paling bawah.</p>
+
+<h2 id="komponen">Komponen</h2>
+
+<p>Pengembangan sistem ini melibatkan:</p>
+<ul>
+  <li><a href="https://osrg.github.io/ryu/">Ryu</a> sebagai SDN controller</li>
+  <li><a href="http://mininet.org/">Mininet</a> sebagai emulator jaringan</li>
+  <li><a href="https://www.snort.org">Snort</a> sebagai IPS signature-based</li>
+</ul>
+
+<h2 id="cara-kerja">Cara Kerja</h2>
+
+<p>Snort diinstal di application plane dan Ryu ditempatkan di control plane. Semua lalu lintas akan terlebih dahulu melewati Ryu dan selanjutnya akan diperiksa oleh Snort berdasarkan pencocokan dengan basis data yang telah didefinisikan sebelumnya (lihat file <code class="language-plaintext highlighter-rouge">myrules.rules</code> di repositori). Jika dinyatakan aman, maka Ryu akan meneruskan ke tujuan. Namun jika terindikasi berbahaya, Snort akan mengirim peringatan serta mengatur lama waktu pemblokiran dengan durasi awal 10 menit. Jika host terus melakukan serangan dalam masa waktu kurang dari atau sama dengan 10 menit, maka waktu pemblokiran akan bertambah sesuai dengan frekuensi dan jenis serangan.</p>
+
+<p>Proses dimulai dari file log <code class="language-plaintext highlighter-rouge">alert.csv</code> yang merupakan output dari Snort yang berisi informasi timestamp, alamat IP asal, alamat IP tujuan, protokol, dan pesan. File <code class="language-plaintext highlighter-rouge">hostInspector.sh</code> akan mengambil baris terakhir dari log tersebut dan mencari selisih waktu antara serangan terakhir dan serangan sebelumnya dari host yang sama. Fuzzy (semua file yang berekstensi <code class="language-plaintext highlighter-rouge">*.py</code>) hanya akan dieksekusi jika selisih waktu penyerangan lebih kecil atau sama dengan 10 menit. Output dari fuzzy adalah durasi waktu blokir dalam satuan detik yang nantinya akan berfungsi untuk menjeda proses. File <code class="language-plaintext highlighter-rouge">block.sh</code> berfungsi untuk mengirimkan flow entry pemblokiran ke Ryu via REST API. File <code class="language-plaintext highlighter-rouge">unblock.sh</code> akan dieksekusi setelah durasi telah mencapai 0 detik dan akan menghapus flow entry pemblokiran.</p>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/university-final-project/master/doc/Topologi%202.png" alt="topologi" width="550" height="400" /><em>Topologi Jaringan</em></p>
+
+<h2 id="setup">Setup</h2>
+<p>Lakukan proses instalasi Ryu, Mininet, dan Snort terlebih dahulu yang dokumentasinya dapat dibaca di situs web mereka masing-masing.</p>
+
+<ol>
+  <li>
+    <p>Jalankan Ryu.</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ryu-manager ~/ryu/ryu/app/rest_firewall.py
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Jalankan Mininet dengan opsi controller remote (diarahkan ke Ryu yang telah running) serta custom topologi yang ada di file <code class="language-plaintext highlighter-rouge">topologi.py</code>.</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mn <span class="nt">--custom</span> ~/mininet/custom/topologi.py <span class="nt">--topo</span> mytopo <span class="nt">--controller</span> remote <span class="nt">--switch</span> ovsk,protocols<span class="o">=</span>OpenFlow13
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Secara default lalu lintas dari dan ke seluruh host akan diblokir oleh Ryu sehingga diperlukan penambahan flow entry dengan cara menjalankan file <code class="language-plaintext highlighter-rouge">flowEntry.sh</code>.</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash ~/flowEntry.sh
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Jalankan Snort menggunakan interface s1-eth1 (switch 1 port eth-1).</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>snort <span class="nt">-i</span> s1-eth1 <span class="nt">-c</span> /etc/snort/snort.conf <span class="nt">-l</span> /var/log/snort
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Jalankan file <code class="language-plaintext highlighter-rouge">hostInspector.sh</code>.</p>
+
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash ~/hostInspector.sh
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="pengujian">Pengujian</h2>
+
+<p>Untuk Pengujian, lakukan uji serangan yang sesuai dengan basis data serangan Snort di file <code class="language-plaintext highlighter-rouge">myrules.rules</code> yaitu host discovery (menggunakan metode port scanning) dan DoS agar peringatan bahwa telah terjadi serangan dapat tersimpan ke <code class="language-plaintext highlighter-rouge">/var/log/snort/alert.csv</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>attacker nmap <span class="nt">-v</span> <span class="nt">-n</span> <span class="nt">-sP</span> <span class="nt">--send-ip</span> 192.168.0.0/29
+</code></pre></div></div>
+
+<p>Sedangkan untuk DoS dapat memanfaatkan tools <code class="language-plaintext highlighter-rouge">hping3</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>attacker hping3 <span class="nt">-c</span> 100 <span class="nt">-d</span> 120 <span class="nt">-S</span> <span class="nt">-w</span> 64 <span class="nt">-p</span> 53 <span class="nt">--flood</span> server
+</code></pre></div></div>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/university-final-project/master/doc/1.png" alt="Tangkapan layar potongan command" /><em>Tangkapan layar selama pengujian berlangsung</em></p>
+
+<h2 id="hasil">Hasil</h2>
+
+<p>Berikut contoh tangkapan layar ketika mencoba ping ke host yang sedang diblokir.</p>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/university-final-project/master/doc/2.png" alt="Tangkapan layar hasil uji serangan" /></p>
+
+<p>Dua gambar di bawah ini menjelaskan bagaimana hubungan antara interval waktu serangan suatu host dengan durasi blokir untuk masing-masing jenis serangan.</p>
+
+<h3 id="host-discovery">Host Discovery</h3>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/university-final-project/master/doc/hasil1-scanning(host-discovery).png" alt="Host Discovery" width="600" height="240" /></p>
+
+<h3 id="dos">DoS</h3>
+
+<p><img src="https://raw.githubusercontent.com/xcodephile/university-final-project/master/doc/hasil2-DoS.png" alt="Host Discovery" width="600" height="240" /></p>
+
+<h2 id="tautan-eksternal">Tautan Eksternal</h2>
+
+<h3 id="kode-sumber">Kode Sumber</h3>
+<p>Kode sumber dan semua file pendukung tersedia di <a href="https://github.com/xcodephile/university-final-project">github.com/xcodephile/university-final-project</a>.</p>
+
+<h3 id="publikasi">Publikasi</h3>
+<p>Penelitian ini telah dipublikasikan di <a href="https://ieeexplore.ieee.org/document/8528735">IEEE</a> dan <a href="https://repository.telkomuniversity.ac.id/pustaka/138374/perancangan-dan-implementasi-adaptive-intrusion-prevention-system-ips-untuk-pencegahan-penyerangan-pada-arsitektur-software-defined-network-sdn-.html">web kampus</a>.</p>
+
+<h3 id="referensi-utama">Referensi Utama</h3>
+<ul>
+  <li><a href="http://ieeexplore.ieee.org/document/6834762/">W. Xia, Y. Wen dan C. H. Foh, “A Survey on Software-Defined Networking,” IEEE Communication Surveys &amp; Tutorials, vol. 17, pp. 27-51, 2015.</a></li>
+  <li><a href="http://ieeexplore.ieee.org/document/7014181/">D. Huang, T. Xing dan Z. Xiong, “SDNIPS: Enabling Software-Defined Networking Based Intrusion Prevention System in Clouds,” CNSM and Workshop, pp. 308-311, 2014.</a></li>
+  <li><a href="http://ieeexplore.ieee.org/document/4599918/">W. El-Hajj, F. Aloul dan Z. Trabelsi, “On Detecting Port Scanning using Fuzzy Based Intrusion Detection System”.</a></li>
+</ul>
+:ET
