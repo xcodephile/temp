@@ -122,7 +122,9 @@ Pastikan cAdvisor telah berjalan dengan baik dengan cara akses ke dashboard cAdv
 
 ![](../../assets/img/posts/cadvisor-1.png)
 
-Jika tidak ada kontainer yang muncul sedangkan perintah `docker ps` menampilkan sebaliknya, dan jika kamu menggunakan WSL 2, maka besar kemungkinan cAdvisor salah dalam mencari 'sumber' kontainer. Ketahui errornya terlebih dahulu dengan cara:
+Jika daftar kontainer dapat ditampilkan oleh cAdvisor, silahkan skip ke bagian [Setup Grafana](#setup-grafana).
+
+Namun jika tidak ada kontainer yang muncul sedangkan perintah `docker ps` menampilkan sebaliknya, dan jika kamu menggunakan WSL 2, maka besar kemungkinan cAdvisor salah dalam mencari 'sumber' kontainer. Ketahui errornya terlebih dahulu dengan cara:
 
 ```
 $ docker logs -f cadvisor
@@ -141,7 +143,7 @@ $ sudo mount -t drvfs '\\wsl$\docker-desktop-data\version-pack-data\community\do
 
 Perintah di atas akan membuat direktori baru yang bernama `my-docker` lalu menyambungkan root directory Docker yang berada di luar Ubuntu ke direktori `/mnt/my-docker` yang berada di dalam Ubuntu.
 
-Ubah baris 27 di file `docker-compose.yml` dari ini:
+Setelah menjalankan perintah di atas, ubah baris 27 di file `docker-compose.yml` dari ini:
 
 ```
 - /var/lib/docker/:/var/lib/docker:ro
