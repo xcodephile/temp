@@ -3,8 +3,6 @@ title: 'Implementasi Kontainerisasi dan CI (Continuous Integration) Sederhana Me
 date: 2022-03-21 07:26:00 +0700
 categories: []    # max 2 elements
 tags: [ci-cd, containerization, jenkins, dsl, docker, docker-compose, dockerfile, redis, webhook]     # should always be lowercase. min = 0, max = infinity
-
-# JOB-03-FREESTYLE-PROJECT-03-DSL
 ---
 
 # Tech Stack
@@ -66,7 +64,7 @@ services:
     - ~/docker-volume/jenkins:/var/jenkins_home
     - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - network
+    - network
   redis:
     image: redis
     container_name: redis
