@@ -16,13 +16,13 @@ tags: [containerization, docker, docker-compose, monitoring, prometheus, grafana
 
 # Prasyarat
 
-Ini adalah lanjutan dari post sebelumnya, [Implementasi Kontainerisasi dan CI (Continuous Integration) Sederhana Menggunakan Jenkins](https://xcodephile.github.io/posts/implementasi-kontainerisasi-dan-ci-sederhana-menggunakan-jenkins-di-docker/). Agar lebih rapi, saya meletakkan Prometheus dan Grafana berada di satu jaringan Docker yang sama dengan kontainer yang dibuat di post sebelumnya, Jenkins dan Redis. Silahkan sesuaikan file `docker-compose.yml` jika ingin dibuat berbeda jaringan.
+Ini adalah lanjutan dari post sebelumnya, [Implementasi Kontainerisasi dan CI (Continuous Integration) Sederhana Menggunakan Jenkins](https://xcodephile.github.io/posts/implementasi-kontainerisasi-dan-ci-sederhana-menggunakan-jenkins-di-docker/). Agar lebih rapi, saya meletakkan Prometheus dan Grafana di satu jaringan Docker yang sama dengan kontainer yang dibuat di post sebelumnya, Jenkins dan Redis. Silahkan sesuaikan file `docker-compose.yml` jika ingin dibuat berbeda jaringan.
 
 # Instalasi
 
 ## Cp. 1: Setup Kontainer
 
-Simpan file `docker-compose.yml` dan `prometheus.yml` berikut ini di dalam satu direktori yang sama.
+Simpan file `docker-compose.yml` dan file config `prometheus.yml` berikut ini di dalam satu direktori yang sama.
 
 ```yaml
 # docker-compose.yml
@@ -122,7 +122,7 @@ Pastikan cAdvisor telah berjalan dengan baik dengan cara akses ke dashboard cAdv
 
 ![](../../assets/img/posts/cadvisor-1.png)
 
-Jika tidak ada kontainer yang muncul sedangkan perintah `docker ps` menampilkan sebaliknya, dan jika kamu menggunakan WSL, maka besar kemungkinan cAdvisor salah dalam mencari 'sumber' kontainer. Ketahui errornya terlebih dahulu dengan cara:
+Jika tidak ada kontainer yang muncul sedangkan perintah `docker ps` menampilkan sebaliknya, dan jika kamu menggunakan WSL 2, maka besar kemungkinan cAdvisor salah dalam mencari 'sumber' kontainer. Ketahui errornya terlebih dahulu dengan cara:
 
 ```
 $ docker logs -f cadvisor
@@ -130,7 +130,7 @@ $ docker logs -f cadvisor
 
 Jika ada banyak error yang bertuliskan `failed to identify the read-write layer ID for container ... open /rootfs/var/lib/docker ... no such file or directory`, maka jalankan perintah berikut ini.
 
-> Secara default root directory Docker berada di /var/lib/docker. Khusus untuk WSL, lokasinya berada di tempat yang berbeda. Saya belum bisa menjamin apakah lokasinya selalu di wsl\docker-desktop-data\version-pack-data\community\docker. Mohon dipastikan terlebih dahulu. Link terkait: github.com/google/cadvisor/issues/2648.
+> Secara default root directory Docker berada di /var/lib/docker. Khusus untuk WSL, lokasinya berada di tempat yang berbeda. Saya belum bisa menjamin apakah lokasinya selalu di wsl\\docker-desktop-data\\version-pack-data\\community\\docker. Mohon dipastikan terlebih dahulu. Link terkait: github.com/google/cadvisor/issues/2648.
 {: .prompt-danger }
 
 ```
@@ -139,7 +139,21 @@ $ sudo mkdir my-docker
 $ sudo mount -t drvfs '\\wsl$\docker-desktop-data\version-pack-data\community\docker' /mnt/my-docker
 ```
 
-Silahkan build ulang dengan cara:
+Perintah di atas akan membuat direktori baru yang bernama `my-docker` lalu menyambungkan root directory Docker yang berada di luar Ubuntu ke direktori `/mnt/my-docker` yang berada di dalam Ubuntu.
+
+Ubah baris 27 di file `docker-compose.yml` dari ini:
+
+```
+- /var/lib/docker/:/var/lib/docker:ro
+```
+
+Menjadi ini:
+
+```
+- /mnt/my-docker/:/rootfs/var/lib/docker:ro
+```
+
+Lalu silahkan build ulang dengan cara:
 
 ```shell
 $ docker-compose up -d
@@ -153,11 +167,11 @@ Akses dashboard Grafana di [http://localhost:3000](http://localhost:3000). Login
 
 ![](../../assets/img/posts/grafana-ui-1.png)
 
-Agar Grafana terhubung ke Prometheus, kita harus tambahkan data source baru dengan cara klik Data Source lalu pilih opsi Prometheus. Grafana akan mengarahkan kita ke halaman pengaturan. Di sini cukup isi form URL `http://prometheus:9090`. Gulir ke paling bawah halaman dan klik Save & Test.
+Agar Grafana terhubung ke Prometheus, kita harus menambahkan data source baru dengan cara klik Data Sources lalu pilih opsi Prometheus. Grafana akan mengarahkan kita ke halaman pengaturan. Di sini cukup isi form URL `http://prometheus:9090`. Gulir ke paling bawah halaman dan klik Save & Test.
 
 ![](../../assets/img/posts/grafana-ui-1b.png)
 
-> Baik Grafana dan Prometheus sama-sama berada di satu jaringan Docker yang sama. Docker secara otomatis menghubungkan nama service (lihat baris 4 di `docker-compose.yml`) ke alamat IP-nya. Karena itulah, hanya dengan menuliskan `prometheus`, Grafana bisa langsung tersambung ke Prometheus.
+> Baik Grafana dan Prometheus sama-sama berada di satu jaringan Docker yang sama. Docker secara otomatis menghubungkan nama service (lihat baris 4 di `docker-compose.yml`) ke alamat IP-nya. Karena itulah, hanya dengan menuliskan `prometheus`, Grafana bisa langsung tersambung ke kontainer Prometheus.
 {: .prompt-tip }
 
 Langkah selanjutnya adalah merancang layout dashboard. Agar jauh lebih praktis, kita gunakan saja dashboard yang tersedia di internet. Caranya, silahkan navigasi ke menu Create lalu klik Import.
@@ -167,6 +181,8 @@ Langkah selanjutnya adalah merancang layout dashboard. Agar jauh lebih praktis, 
 Di form Import via Grafana.com, isikan `893`. Ini adalah ID dari dashboard [grafana.com/grafana/dashboards/893](https://grafana.com/grafana/dashboards/893). Jangan lupa klik Load. Selanjutnya, isi nama dashboard di form Name kemudian pilih Prometheus pada menu dropdown Select a Prometheus Data Source. Klik Import.
 
 Selesai.
+
+![](../../assets/img/posts/grafana.png)
 
 # Tautan Eskternal
 
