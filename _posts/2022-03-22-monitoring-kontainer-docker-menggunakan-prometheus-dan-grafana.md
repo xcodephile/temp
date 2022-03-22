@@ -12,7 +12,7 @@ tags: [containerization, docker, docker-compose, monitoring, prometheus, grafana
 - [cAdvisor](https://github.com/google/cadvisor)
 - [Docker](https://docs.docker.com/get-started/overview/)
 
-![](../../assets/img/posts/grafana-prometheus-monitoring.png)
+![](../../assets/img/posts/grafana-prometheus-monitoring.gif)
 
 # Prasyarat
 
