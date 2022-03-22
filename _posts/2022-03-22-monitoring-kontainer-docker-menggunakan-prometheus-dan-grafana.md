@@ -130,7 +130,7 @@ $ docker logs -f cadvisor
 
 Jika ada banyak error yang bertuliskan `failed to identify the read-write layer ID for container ... open /rootfs/var/lib/docker ... no such file or directory`, maka jalankan perintah berikut ini.
 
-> Secara default root directory Docker berada di /var/lib/docker. Khusus untuk WSL, lokasinya berada di tempat yang berbeda. Saya belum bisa menjamin apakah lokasinya selalu di wsl\docker-desktop-data\version-pack-data\community\docker. Mohon dipastikan terlebih dahulu. Link terkait: [github.com/google/cadvisor/issues/2648](github.com/google/cadvisor/issues/2648).
+> Secara default root directory Docker berada di /var/lib/docker. Khusus untuk WSL, lokasinya berada di tempat yang berbeda. Saya belum bisa menjamin apakah lokasinya selalu di wsl\docker-desktop-data\version-pack-data\community\docker. Mohon dipastikan terlebih dahulu. Link terkait: github.com/google/cadvisor/issues/2648.
 {: .prompt-danger }
 
 ```
