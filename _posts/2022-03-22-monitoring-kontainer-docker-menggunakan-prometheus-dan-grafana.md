@@ -18,6 +18,9 @@ tags: [containerization, docker, docker-compose, monitoring, prometheus, grafana
 
 Ini adalah lanjutan dari post sebelumnya, [Implementasi Kontainerisasi dan CI (Continuous Integration) Sederhana Menggunakan Jenkins](https://xcodephile.github.io/posts/implementasi-kontainerisasi-dan-ci-sederhana-menggunakan-jenkins-di-docker/). Agar lebih rapi, saya meletakkan Prometheus dan Grafana di satu jaringan Docker yang sama dengan kontainer yang dibuat di post sebelumnya, Jenkins dan Redis. Silahkan sesuaikan file `docker-compose.yml` jika ingin dibuat berbeda jaringan.
 
+> Lihat detail jaringan yang dibuat oleh Docker dengan cara `docker network ls` dan `docker network inspect network_name`
+{: .prompt-tip }
+
 # Instalasi
 
 ## Cp. 1: Setup Kontainer
